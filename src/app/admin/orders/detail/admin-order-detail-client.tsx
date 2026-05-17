@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
@@ -18,12 +18,14 @@ const nextActions: Partial<Record<OrderStatus, { label: string; status: OrderSta
 };
 
 export function AdminOrderDetailClient() {
-  const params = useParams();
-  const orderNumber = params.orderNumber as string;
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const orderNumber = searchParams.get('order') ?? '';
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = () => {
+    if (!orderNumber) return;
     setLoading(true);
     api
       .get<{ order: Order }>(`/admin/orders/${orderNumber}`)
@@ -33,8 +35,12 @@ export function AdminOrderDetailClient() {
   };
 
   useEffect(() => {
+    if (!orderNumber) {
+      router.replace('/admin/orders');
+      return;
+    }
     load();
-  }, [orderNumber]);
+  }, [orderNumber, router]);
 
   const updateStatus = async (status: OrderStatus) => {
     try {
@@ -59,6 +65,7 @@ export function AdminOrderDetailClient() {
     }
   };
 
+  if (!orderNumber) return null;
   if (loading) return <p className="p-8 text-muted-foreground">Loading...</p>;
   if (!order) return null;
 

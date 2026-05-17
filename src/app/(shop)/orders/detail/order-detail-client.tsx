@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Package } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { OrderStatusTimeline } from '@/components/orders/order-status-timeline';
 import { DeliveryQrCard } from '@/components/orders/delivery-qr-card';
+import { shopOrderPath } from '@/lib/order-paths';
 import { getOrder, submitPaymentProof } from '@/services/orders';
 import { useAuthStore } from '@/store/auth-store';
 import type { DeliveryQr, Order } from '@/types';
@@ -28,9 +29,9 @@ const statusColors: Record<string, string> = {
 };
 
 export function OrderDetailClient() {
-  const params = useParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
-  const orderNumber = params.orderNumber as string;
+  const orderNumber = searchParams.get('order') ?? '';
   const user = useAuthStore((s) => s.user);
 
   const [order, setOrder] = useState<Order | null>(null);
@@ -41,6 +42,7 @@ export function OrderDetailClient() {
   const [submitting, setSubmitting] = useState(false);
 
   const loadOrder = () => {
+    if (!orderNumber) return;
     setLoading(true);
     getOrder(orderNumber)
       .then(({ order: o, deliveryQr: qr }) => {
@@ -55,8 +57,12 @@ export function OrderDetailClient() {
   };
 
   useEffect(() => {
+    if (!orderNumber) {
+      router.replace('/orders');
+      return;
+    }
     if (!user) {
-      router.push(`/login?redirect=/orders/${orderNumber}`);
+      router.push(`/login?redirect=${encodeURIComponent(shopOrderPath(orderNumber))}`);
       return;
     }
     loadOrder();
@@ -84,7 +90,7 @@ export function OrderDetailClient() {
     }
   };
 
-  if (!user) return null;
+  if (!orderNumber || !user) return null;
 
   if (loading) {
     return (

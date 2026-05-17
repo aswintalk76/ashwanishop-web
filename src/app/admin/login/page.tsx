@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { api } from '@/lib/api';
+import { getApiErrorMessage } from '@/lib/api-errors';
 import Cookies from 'js-cookie';
 import { useAuthStore } from '@/store/auth-store';
 import { toast } from 'sonner';
@@ -31,12 +32,7 @@ export default function AdminLoginPage() {
       toast.success('Admin login successful');
       router.push('/admin');
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { status?: number; data?: { message?: string } }; message?: string };
-      if (!axiosErr.response) {
-        toast.error('Cannot reach API. Check CORS and that the backend URL is correct.');
-        return;
-      }
-      toast.error(axiosErr.response.data?.message || 'Invalid admin credentials');
+      toast.error(getApiErrorMessage(err, 'Invalid admin credentials'));
     }
   };
 

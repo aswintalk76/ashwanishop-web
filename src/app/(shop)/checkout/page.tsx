@@ -12,6 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useCartStore } from '@/store/cart-store';
 import { useAuthStore } from '@/store/auth-store';
 import { api } from '@/lib/api';
+import { shopOrderPath } from '@/lib/order-paths';
 import { StorageImage } from '@/components/storage-image';
 import {
   ShippingAddressSection,
@@ -109,7 +110,7 @@ export default function CheckoutPage() {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       toast.success('Payment proof submitted!');
-      router.push(`/orders/${orderNumber}`);
+      router.push(shopOrderPath(orderNumber));
     } catch {
       toast.error('Failed to submit payment proof');
     }

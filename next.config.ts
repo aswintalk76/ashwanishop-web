@@ -1,7 +1,8 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  output: 'export',
+  // Static export only for production builds (Hostinger). Dev allows dynamic routes.
+  ...(process.env.NODE_ENV === 'production' ? { output: 'export' as const } : {}),
   // Hostinger/Apache: export categories/index.html so /categories/ does not 403
   trailingSlash: true,
 

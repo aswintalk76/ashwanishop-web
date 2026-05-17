@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { adminOrderPath } from '@/lib/order-paths';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { getApiErrorMessage } from '@/lib/api-errors';
 import { toast } from 'sonner';
 import type { Order } from '@/types';
 
@@ -21,8 +23,8 @@ export default function AdminOrdersPage() {
       await api.post(`/admin/orders/${orderNumber}/verify-payment`);
       toast.success('Payment verified');
       load();
-    } catch {
-      toast.error('Verification failed');
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, 'Verification failed'));
     }
   };
 
@@ -52,7 +54,7 @@ export default function AdminOrdersPage() {
                     Verify Payment
                   </Button>
                 )}
-                <Link href={`/admin/orders/${o.order_number}`} className="inline-flex h-7 items-center rounded-lg border px-2.5 text-sm hover:bg-muted">
+                <Link href={adminOrderPath(o.order_number)} className="inline-flex h-7 items-center rounded-lg border px-2.5 text-sm hover:bg-muted">
                   View
                 </Link>
               </TableCell>
