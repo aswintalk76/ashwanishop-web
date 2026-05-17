@@ -74,7 +74,7 @@ export default async function HomePage() {
             {categories.slice(0, 6).map((cat: { id: number; name: string; slug: string }) => (
               <Link
                 key={cat.id}
-                href={`/categories/${cat.slug}`}
+                href={`/products?category=${cat.slug}`}
                 className="rounded-xl border bg-gradient-to-r from-muted to-muted/50 p-8 text-center font-semibold transition hover:border-orange-500 hover:shadow-md"
               >
                 {cat.name}
